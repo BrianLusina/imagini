@@ -1,39 +1,72 @@
 // server.js
-// where your node app starts
 
-// init project
 var express = require('express');
 var app = express();
+let url = require("url");
+let http = require("http");
+let mongo = require("mongodb").MongoClient;
 
-// we've started you off with Express, 
-// but feel free to use whatever libs or frameworks you'd like through `package.json`.
-
-// http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
-// http://expressjs.com/en/starter/basic-routing.html
-app.get("/", function (request, response) {
-  response.sendFile(__dirname + '/views/index.html');
-});
+let mongoUri = process.env.MONGO_DB_URI;
+var collectionName = 'imagesearch';
 
-app.get("/dreams", function (request, response) {
-  response.send(dreams);
-});
 
-// could also use the POST body instead of query string: http://expressjs.com/en/api.html#req.body
-app.post("/dreams", function (request, response) {
-  dreams.push(request.query.dream);
-  response.sendStatus(200);
-});
+/**
+ * Perform a log search in the given database, connects to the database and searches for the given term
+ * inserts the item into the database
+ * @param argument for the image search in db
+ * @param callback Callback function
+*/
+function logSearch(argument, callback){
+    mongo.connect(mongoUri, (err, db)=>{
+      if(err){
+        return callback(err);
+      }
+      
+      let document = {
+        term : argument,
+        when : new Date()
+      }
+      
+      db.collection(collectionName)
+        .insert(document, (err, result) => {
+          if(err){
+            return callback(err);
+          }
+          
+          db.close()
+          callback(null);
+      });
+    });
+}
 
-// Simple in-memory store for now
-var dreams = [
-  "Find and count some sheep",
-  "Climb a really tall mountain",
-  "Wash the dishes"
-];
+mongo.connect(process.env.MONGO_DB_URI, (err, db)=>{
+  if(err){
+    console.log("Can't connect to DB")
+    throw err
+  }
+  
+  // define the collection to use
+  let collection = db.collection("image_history");
 
-// listen for requests :)
-var listener = app.listen(process.env.PORT, function () {
-  console.log('Your app is listening on port ' + listener.address().port);
+  // home index
+  app.get("/", function (request, response) {
+    response.sendFile(__dirname + '/views/index.html');
+  });
+  
+  // url to get the images
+  app.get("/imagesearch/:arg", (request, response)=> {
+    let arg = request.params.arg;
+    let offset = request.query.offset || 1;
+    
+  })
+
+  // listen for requests :)
+  let port = process.env.PORT || 8000
+
+  app.listen(port, () => {
+    console.log(`App is listening on port ${port}`);
+  });
+  
 });
