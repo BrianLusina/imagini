@@ -3,11 +3,9 @@
 let express = require('express');
 let app = express();
 let url = require("url");
-let https = require("https");
+let http = require("http");
 let mongo = require("mongodb").MongoClient;
 let mongoUri = process.env.MONGO_DB_URI;
-let googleApiKey = process.env.GOOGLE_API_KEY;
-let googleCtx = process.env.GOOGLE_CTX;
 let collectionName = 'imagesearch';
 
 app.use(express.static('public'));
@@ -73,9 +71,9 @@ function searchForImage(argument, offset, callback){
     }
     
     let startIn = (offset - 1) * 10 + 1
-    let url = `https://www.googleapis.com/customsearch/v1?&searchType=image&q=${argument}&start=${startIn}&key=${googleApiKey}&cx=${googleCtx}`;
+    let url = `http://api.pixplorer.co.uk/image?word=${argument}&amount=${offset}&size=l`
     
-    https.get(url, (response) => {
+    http.get(url, (response) => {
       let body = "";
       response.on("data", (d)=>{
         body  += d;
@@ -134,6 +132,11 @@ app.get("/api/images/latest", (request, response) => {
         }
     response.send(result);
   });
+});
+
+// error response
+app.get('*', function (request, response) {
+    response.status(404);
 });
 
 // listen for requests :)
