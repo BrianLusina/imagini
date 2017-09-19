@@ -1,0 +1,30 @@
+{
+  "name": "imagini",
+  "version": "0.0.1",
+  "description": "Image Search abstraction layer",
+  "main": "server.js",
+  "author":"Brian Lusina",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.15.3",
+    "mongodb": "^2.2.31",
+    "pug": "^0.1.0"
+  },
+  "engines": {
+    "node": "8.x"
+  },
+  "repository": {
+    "url": "https://github.com/BrianLusina/imagini.git"
+  },
+  "bugs" :{
+    "url":"https://github.com/BrianLusina/imagini.git/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "node",
+    "image search",
+    "express"
+  ]
+}
